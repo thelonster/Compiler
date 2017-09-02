@@ -15,3 +15,11 @@ std::string gettoken(std::ifstream input) {
 std::string getlexeme() {
 
 }
+
+bool isseparator(char c) {
+	return 0;
+}
+
+bool isoperator(char c) {
+	return 0;
+}

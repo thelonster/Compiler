@@ -6,5 +6,6 @@
 
 std::string gettoken(std::ifstream input);
 std::string getlexeme();
-
+bool isseparator(char c);
+bool isoperator(char c);
 #endif // !compiler_h
