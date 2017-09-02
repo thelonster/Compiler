@@ -4,7 +4,26 @@ std::string gettoken(std::ifstream input) {
 	std::string token;
 	char c;
 	while (input.get(c)) {
-		if (isalnum(c))
+		if (isseparator(c)) {
+			token += c;
+			if (c == '%') {
+				//add another if statement later to check if c is % again
+				//incase you need to unget() (do this when making error handler)
+				input.get(c);
+				token += c;
+			}
+			return token;
+		}
+		else if (isoperator(c)) {
+			token += c;
+			input.get(c);
+			if (c == '=')
+				token += c;
+			else
+				input.unget();
+			return token;
+		}
+		else if (isalnum(c))
 			token += c;
 		else
 			break;
@@ -17,9 +36,15 @@ std::string getlexeme() {
 }
 
 bool isseparator(char c) {
-	return 0;
+	if (c == '(' || c == ')' || c == '{' || c == '}' || c == '%' || c == '@')
+		return true;
+	else
+		return false;
 }
 
 bool isoperator(char c) {
-	return 0;
+	if (c == '+' || c == '-' || c == '/' || c == '*' || c == '<' || c == '>' || c == '=' || c == ':' || c == '!')
+		return true;
+	else
+		return false;
 }
