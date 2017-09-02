@@ -1,7 +1,9 @@
 #include "compiler.h"
 #include <iostream>
+#include <fstream>
 
 int main() {
-	FILE input;
+	std::ifstream input;
+
 	
 }
