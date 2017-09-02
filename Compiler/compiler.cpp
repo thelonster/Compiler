@@ -32,7 +32,15 @@ std::string gettoken(std::ifstream input) {
 }
 
 std::string identifylexeme(std::string lexeme) {
-
+	char first = lexeme[0];
+	if (isseparator(first))
+		return "separator";
+	else if (isoperator(first))
+		return "operator";
+	for (int a = 0; a < keywords->size; a++)
+		if (lexeme.compare(keywords[a]) == 0)
+			return "keyword";
+	return "unknown";
 }
 
 bool isseparator(char c) {
