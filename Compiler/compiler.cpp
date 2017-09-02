@@ -31,7 +31,7 @@ std::string gettoken(std::ifstream input) {
 	return token;
 }
 
-std::string getlexeme() {
+std::string identifylexeme(std::string lexeme) {
 
 }
 

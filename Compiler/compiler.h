@@ -5,7 +5,7 @@
 #include <fstream>
 
 std::string gettoken(std::ifstream input);
-std::string getlexeme();
+std::string identifylexeme(std::string lexeme);
 bool isseparator(char c);
 bool isoperator(char c);
 #endif // !compiler_h
