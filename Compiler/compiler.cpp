@@ -3,9 +3,20 @@
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
+std::vector<char> letters = { 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z' };
+std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
 void lexer(std::ifstream& input) {
+	
+}
 
+int getcase(char c) {
+	if (isalpha(c))
+		return 1;
+	else if (isdigit(c))
+		return 2;
+	else
+		return -1;
 }
 
 std::string gettoken(std::ifstream& input) {
