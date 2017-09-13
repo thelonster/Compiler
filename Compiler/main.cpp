@@ -8,9 +8,9 @@ int main() {
 	input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
 	std::string token;
 	std::string lexeme;
-	token = gettoken(input);
-	lexeme = identifylexeme(token);
-	std::cout << "Token\tLexeme\n" << lexeme << "\t" << token << "\n";
-
+	//token = gettoken(input);
+	//lexeme = identifylexeme(token);
+	//std::cout << "Token\tLexeme\n" << lexeme << "\t" << token << "\n";
+	input.close();
 	return 0;
 }

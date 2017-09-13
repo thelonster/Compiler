@@ -1,5 +1,13 @@
 #include "compiler.h"
 
+std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write" };
+std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
+std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
+
+void lexer(std::ifstream& input) {
+
+}
+
 std::string gettoken(std::ifstream& input) {
 	std::string token;
 	char c;
@@ -27,33 +35,33 @@ std::string gettoken(std::ifstream& input) {
 			token += c;
 		else
 			break;
+			
 	}
 	return token;
 }
 
 std::string identifylexeme(std::string lexeme) {
-	std::string fuckwords[] = { "while", "if", "int", "fi", "else", "return", "read", "write" };
 	char first = lexeme[0];
 	if (isseparator(first))
 		return "separator";
 	else if (isoperator(first))
 		return "operator";
-	for (int a = 0; a < 8; a++)
-		if (lexeme.compare(fuckwords[a]) == 0)
+	for (int a = 0; a < keywords.size(); a++)
+		if (lexeme.compare(keywords[a]) == 0)
 			return "keyword";
 	return "unknown";
 }
 
 bool isseparator(char c) {
-	if (c == '(' || c == ')' || c == '{' || c == '}' || c == '%' || c == '@')
-		return true;
-	else
-		return false;
+	for (auto it = separators.begin(); it != separators.end(); it++)
+		if (*it == c)
+			return true;
+	return false;
 }
 
 bool isoperator(char c) {
-	if (c == '+' || c == '-' || c == '/' || c == '*' || c == '<' || c == '>' || c == '=' || c == ':' || c == '!')
-		return true;
-	else
-		return false;
+	for (auto it = operators.begin(); it != operators.end(); it++)
+		if (*it == c)
+			return true;
+	return false;
 }

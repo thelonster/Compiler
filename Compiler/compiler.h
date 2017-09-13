@@ -5,10 +5,12 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <algorithm>
 
 //std::string keywords[] = {"while", "if", "int", "fi", "else", "return", "read", "write"};
 
-
+void lexer(std::ifstream& input);
 std::string gettoken(std::ifstream& input);
 std::string identifylexeme(std::string lexeme);
 bool isseparator(char c);
