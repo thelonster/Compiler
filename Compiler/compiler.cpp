@@ -7,13 +7,60 @@ std::vector<char> letters = { 'a','b','c','d','e','f','g','h','i','j','k','l','m
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
 void lexer(std::ifstream& input) {
-	
+	std::string token;
+	char c;
+	bool floatflag = false, tokenfound = false;
+	while (input.get(c)) {
+		tokenfound = false;
+		switch (getcase(c)) {
+			//This case is for ID's
+			case 1:
+				break;
+			//This case is for ints and floats
+			case 2:
+				do {
+					switch (numcase(c))	{
+						//number case
+						case 1:
+							token += c;
+							break;
+						//period case
+						case 2:
+							floatflag = true;
+							token += c;
+							break;
+						//terminating case
+						default:
+							input.unget();
+							if (floatflag) {
+								std::cout << token << " float" << std::endl;
+							}
+							else
+								std::cout << token << " int" << std::endl;
+							floatflag = false;
+							token = "";
+							tokenfound = true;
+							break;
+					}
+				} while (input.get(c) && !tokenfound);				
+				break;
+		}
+	}
 }
 
 int getcase(char c) {
 	if (isalpha(c))
 		return 1;
 	else if (isdigit(c))
+		return 2;
+	else
+		return -1;
+}
+
+int numcase(char c) {
+	if (isdigit(c))
+		return 1;
+	else if (c == '.')
 		return 2;
 	else
 		return -1;
