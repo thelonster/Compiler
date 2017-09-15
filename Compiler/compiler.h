@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 
 //std::string keywords[] = {"while", "if", "int", "fi", "else", "return", "read", "write"};
 

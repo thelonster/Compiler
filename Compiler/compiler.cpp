@@ -29,7 +29,7 @@ void lexer(std::ifstream& input) {
                         case 2:
                             //Can't have 2 # signs in a row
                             if (hashflag) {
-                                std::cout << token << " unknown" << std::endl;
+                                std::cout << token << std::setw(10) << "unknown" << std::endl;
                                 tokenfound = true;
                                 break;
                             }
@@ -43,16 +43,16 @@ void lexer(std::ifstream& input) {
                             break;
                         //accepting state
                         default:
-                            input.unget();
+                            input.putback(c);
                             tokenfound = true;
                             for (auto it = keywords.begin(); it != keywords.end(); it++) {
                                 if (token == *it) {
-                                    std::cout << token << " keyword" << std::endl;
+                                    std::cout << token << "\tkeyword" << std::endl;
                                     keyflag = true;
                                 }
                             }
                             if (!keyflag)
-                                std::cout << token << " identifier" << std::endl;
+                                std::cout << token << "\tidentifier" << std::endl;
                             keyflag = false;
                             token = "";
                             break;
@@ -76,9 +76,9 @@ void lexer(std::ifstream& input) {
 						default:
 							input.unget();
 							if (floatflag)
-								std::cout << token << " float" << std::endl;
+								std::cout << token << "\tfloat" << std::endl;
 							else
-								std::cout << token << " int" << std::endl;
+								std::cout << token << "\tint" << std::endl;
 							floatflag = false;
 							token = "";
 							tokenfound = true;
@@ -89,7 +89,7 @@ void lexer(std::ifstream& input) {
             //state for operators & separators (also blank spaces)
             default:
                 if (isseparator(c))
-                    std::cout << c << " separator" << std::endl;
+                    std::cout << c << "\tseparator" << std::endl;
                 else if (isoperator(c)) {
                     token += c;
                     input.get(c);
@@ -97,7 +97,7 @@ void lexer(std::ifstream& input) {
                         token += c;
                     else
                         input.unget();
-                    std::cout << token << " operator" << std::endl;
+                    std::cout << token << "\toperator" << std::endl;
                     token = "";
                 }
 
