@@ -17,7 +17,7 @@ void lexer(std::ifstream& input) {
 			case 1:
 				//state 1 -> 2: adding letter then moving to second state
 				token += c;
-				while (input.get(c) && !tokenfound) {
+				while (!tokenfound && input.get(c)) {
 					switch (idstate(c)) {
                         //letter state
 						case 1:
@@ -43,7 +43,7 @@ void lexer(std::ifstream& input) {
                             break;
                         //accepting state
                         default:
-                            input.putback(c);
+                            input.unget();
                             tokenfound = true;
                             for (auto it = keywords.begin(); it != keywords.end(); it++) {
                                 if (token == *it) {
@@ -84,7 +84,7 @@ void lexer(std::ifstream& input) {
 							tokenfound = true;
 							break;
 					}
-				} while (input.get(c) && !tokenfound);				
+				} while (!tokenfound && input.get(c));
 				break;
             //state for operators & separators (also blank spaces)
             default:
