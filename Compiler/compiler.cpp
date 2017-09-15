@@ -9,35 +9,73 @@ std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 void lexer(std::ifstream& input) {
 	std::string token;
 	char c;
-	bool floatflag = false, tokenfound = false, hashflag = false;
+	bool floatflag = false, tokenfound = false, hashflag = false, keyflag = false;
 	while (input.get(c)) {
 		tokenfound = false;
-		switch (getcase(c)) {
+		switch (getstate(c)) {
 			//This case is for ID's
 			case 1:
 				//state 1 -> 2: adding letter then moving to second state
 				token += c;
-				
+				while (input.get(c) && !tokenfound) {
+					switch (idstate(c)) {
+                        //letter state
+						case 1:
+						    token += c;
+                            hashflag = false; //if a number is added, reset hashflag
+						    //break moves from state 3/6 to state 2
+						    break;
+                        //# state
+                        case 2:
+                            //Can't have 2 # signs in a row
+                            if (hashflag) {
+                                std::cout << token << " unknown" << std::endl;
+                                tokenfound = true;
+                                break;
+                            }
+                            token += c;
+                            hashflag = true;
+                            break;
+                        //number state
+                        case 3:
+                            token += c;
+                            hashflag = false;
+                            break;
+                        //accepting state
+                        default:
+                            input.unget();
+                            tokenfound = true;
+                            for (auto it = keywords.begin(); it != keywords.end(); it++) {
+                                if (token == *it) {
+                                    std::cout << token << " keyword" << std::endl;
+                                    keyflag = true;
+                                }
+                            }
+                            if (!keyflag)
+                                std::cout << token << " identifier" << std::endl;
+                            keyflag = false;
+                            break;
+					}
+				}
 				break;
-			//This case is for ints and floats
+			//This state is for ints and floats
 			case 2:
 				do {
-					switch (numcase(c))	{
-						//number case
+					switch (numstate(c))	{
+						//number state
 						case 1:
 							token += c;
 							break;
-						//period case
+						//period state
 						case 2:
 							floatflag = true;
 							token += c;
 							break;
-						//terminating case
+						//accepting state
 						default:
 							input.unget();
-							if (floatflag) {
+							if (floatflag)
 								std::cout << token << " float" << std::endl;
-							}
 							else
 								std::cout << token << " int" << std::endl;
 							floatflag = false;
@@ -47,11 +85,18 @@ void lexer(std::ifstream& input) {
 					}
 				} while (input.get(c) && !tokenfound);				
 				break;
+            //state for operators & separators (also blank spaces)
+            default:
+                if (isseparator(c))
+                    std::cout << c << " separator" << std::endl;
+                else if (isoperator(c))
+                    std::cout << c << " operator" << std::endl;
+
 		}
 	}
 }
 
-int getcase(char c) {
+int getstate(char c) {
 	if (isalpha(c))
 		return 1;
 	else if (isdigit(c))
@@ -60,7 +105,7 @@ int getcase(char c) {
 		return -1;
 }
 
-int numcase(char c) {
+int numstate(char c) {
 	if (isdigit(c))
 		return 1;
 	else if (c == '.')
@@ -69,7 +114,7 @@ int numcase(char c) {
 		return -1;
 }
 
-int idcase(char c) {
+int idstate(char c) {
 	if (isalpha(c))
 		return 1;
 	else if (c == '#')

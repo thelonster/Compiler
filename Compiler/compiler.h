@@ -11,7 +11,9 @@
 //std::string keywords[] = {"while", "if", "int", "fi", "else", "return", "read", "write"};
 
 void lexer(std::ifstream& input);
-int getcase(char c);
+int getstate(char c);
+int numstate(char c);
+int idstate(char c);
 std::string gettoken(std::ifstream& input);
 std::string identifylexeme(std::string lexeme);
 bool isseparator(char c);
