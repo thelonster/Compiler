@@ -54,6 +54,7 @@ void lexer(std::ifstream& input) {
                             if (!keyflag)
                                 std::cout << token << " identifier" << std::endl;
                             keyflag = false;
+                            token = "";
                             break;
 					}
 				}

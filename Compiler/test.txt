@@ -1,1 +1,1 @@
-while ( )
+while (if a == b) 
