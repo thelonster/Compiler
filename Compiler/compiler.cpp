@@ -88,8 +88,16 @@ void lexer(std::ifstream& input) {
 				break;
             //state for operators & separators (also blank spaces)
             default:
-                if (isseparator(c))
-                    std::cout << "separator\t" << c << std::endl;
+                if (isseparator(c)) {
+                    token += c;
+                    input.get(c);
+                    if (isseparator(c))
+                        token += c;
+                    else
+                        input.unget();
+                    std::cout << "separator\t" << token << std::endl;
+                    token = "";
+                }
                 else if (isoperator(c)) {
                     token += c;
                     input.get(c);
