@@ -1,7 +1,5 @@
 #include "compiler.h"
 #include "macros.h"
- 
-//Note to self: use replace case numbers with easy to read macro state names
 
 void lexer(std::ifstream& input) {
 	std::string token;
