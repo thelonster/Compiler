@@ -14,8 +14,6 @@ void lexer(std::ifstream& input);
 int getstate(char c);
 int numstate(char c);
 int idstate(char c);
-std::string gettoken(std::ifstream& input);
-std::string identifylexeme(std::string lexeme);
 bool isseparator(char c);
 bool isoperator(char c);
 
