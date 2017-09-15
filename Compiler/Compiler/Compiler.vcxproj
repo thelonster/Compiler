@@ -118,7 +118,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\compiler.cpp" />
-    <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test.txt" />

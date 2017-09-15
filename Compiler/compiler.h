@@ -20,5 +20,6 @@ int idstate(char c);
 bool isseparator(char c);
 /*Returns true if character value is a operator as defined in vector*/
 bool isoperator(char c);
-
+/*runs the lexer*/
+int main();
 #endif // !compiler_h

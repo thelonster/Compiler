@@ -3,7 +3,7 @@
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
-
+ 
 //Note to self: use replace case numbers with easy to read macro state names
 
 void lexer(std::ifstream& input) {
@@ -154,4 +154,15 @@ bool isoperator(char c) {
 		if (*it == c)
 			return true;
 	return false;
+}
+
+int main() {
+    std::ifstream input;
+    input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
+    std::string token;
+    std::string lexeme;
+    std::cout << "Token\t\tLexeme" << std::endl;
+    lexer(input);
+    input.close();
+    return 0;
 }
