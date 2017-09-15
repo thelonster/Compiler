@@ -115,6 +115,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\compiler.h" />
+    <ClInclude Include="..\macros.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\compiler.cpp" />

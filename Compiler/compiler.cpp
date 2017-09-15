@@ -1,8 +1,5 @@
 #include "compiler.h"
-
-std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write" };
-std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
-std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
+#include "macros.h"
  
 //Note to self: use replace case numbers with easy to read macro state names
 
@@ -14,19 +11,20 @@ void lexer(std::ifstream& input) {
 		tokenfound = false;
 		switch (getstate(c)) {
 			//This case is for ID's
-			case 1:
+			case ID_STATE:
 				//state 1 -> 2: adding letter then moving to second state
 				token += c;
 				while (!tokenfound && input.get(c)) {
+                    //This switch is the 2nd state that can move to the 3rd/4th/5th/6th state
 					switch (idstate(c)) {
                         //letter state
-						case 1:
+						case ID_LETTER:
 						    token += c;
                             hashflag = false; //if a number is added, reset hashflag
 						    //break moves from state 3/6 to state 2
 						    break;
                         //# state
-                        case 2:
+                        case ID_POUND:
                             //Can't have 2 # signs in a row
                             if (hashflag) {
                                 std::cout << "unknown\t" << token << std::endl;
@@ -37,7 +35,7 @@ void lexer(std::ifstream& input) {
                             hashflag = true;
                             break;
                         //number state
-                        case 3:
+                        case ID_NUMBER:
                             token += c;
                             hashflag = false;
                             break;
@@ -60,15 +58,16 @@ void lexer(std::ifstream& input) {
 				}
 				break;
 			//This state is for ints and floats
-			case 2:
+			case NUMBER_STATE:
 				do {
+                    //This switch is the 1st state where is can move to the 2nd/3rd/4th state
 					switch (numstate(c))	{
 						//number state
-						case 1:
+						case NUM_NUMBER:
 							token += c;
 							break;
 						//period state
-						case 2:
+						case NUM_PERIOD:
 							floatflag = true;
 							token += c;
 							break;
@@ -108,36 +107,36 @@ void lexer(std::ifstream& input) {
                     std::cout << "operator\t" << token << std::endl;
                     token = "";
                 }
-
+                break;
 		}
 	}
 }
 
 int getstate(char c) {
 	if (isalpha(c))
-		return 1;
+		return ID_STATE;
 	else if (isdigit(c))
-		return 2;
+		return NUMBER_STATE;
 	else
 		return -1;
 }
 
 int numstate(char c) {
 	if (isdigit(c))
-		return 1;
+		return NUM_NUMBER;
 	else if (c == '.')
-		return 2;
+		return NUM_PERIOD;
 	else
 		return -1;
 }
 
 int idstate(char c) {
 	if (isalpha(c))
-		return 1;
+		return ID_LETTER;
 	else if (c == '#')
-		return 2;
+		return ID_POUND;
 	else if (isdigit(c))
-		return 3;
+		return ID_NUMBER;
 	else
 		return -1;
 }
