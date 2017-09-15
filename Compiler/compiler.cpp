@@ -9,12 +9,15 @@ std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 void lexer(std::ifstream& input) {
 	std::string token;
 	char c;
-	bool floatflag = false, tokenfound = false;
+	bool floatflag = false, tokenfound = false, hashflag = false;
 	while (input.get(c)) {
 		tokenfound = false;
 		switch (getcase(c)) {
 			//This case is for ID's
 			case 1:
+				//state 1 -> 2: adding letter then moving to second state
+				token += c;
+				
 				break;
 			//This case is for ints and floats
 			case 2:
@@ -62,6 +65,17 @@ int numcase(char c) {
 		return 1;
 	else if (c == '.')
 		return 2;
+	else
+		return -1;
+}
+
+int idcase(char c) {
+	if (isalpha(c))
+		return 1;
+	else if (c == '#')
+		return 2;
+	else if (isdigit(c))
+		return 3;
 	else
 		return -1;
 }
