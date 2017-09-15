@@ -1,6 +1,7 @@
 #include "compiler.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <assert.h>
 
 int main() {
@@ -8,10 +9,8 @@ int main() {
 	input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
 	std::string token;
 	std::string lexeme;
-    std::cout << "Token\tLexeme\n" << lexeme << "\t" << token << "\n";
+    std::cout << "Token\tLexeme" << std::endl;
     lexer(input);
-	//token = gettoken(input);
-	//lexeme = identifylexeme(token);
 	input.close();
 	return 0;
 }
