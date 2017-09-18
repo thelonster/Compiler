@@ -13,7 +13,7 @@ std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
-void lexer(std::ifstream& input);
+std::string lexer(std::ifstream& input, char c);
 /*Returns whether to go to ID, int/real, or the other states*/
 int getstate(char c);
 /*Returns whether a number, period, or other character is found and goes to that state*/

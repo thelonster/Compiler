@@ -1,9 +1,8 @@
 #include "compiler.h"
 #include "macros.h"
 
-void lexer(std::ifstream& input) {
+std::string lexer(std::ifstream& input, char c) {
     std::string token;
-    char c;
     bool floatflag = false, tokenfound = false, hashflag = false, keyflag = false;
     while (input.get(c)) {
         tokenfound = false;
@@ -56,7 +55,7 @@ void lexer(std::ifstream& input) {
                 }
                 break;
             //This state is for ints and floats
-			case NUMBER_STATE:
+            case NUMBER_STATE:
                 do {
                     //This switch is the 1st state where is can move to the 2nd/3rd/4th state
                     switch (numstate(c))	{
@@ -108,6 +107,7 @@ void lexer(std::ifstream& input) {
                 break;
         }
     }
+    return token;
 }
 
 int getstate(char c) {
@@ -156,10 +156,10 @@ bool isoperator(char c) {
 int main() {
     std::ifstream input;
     input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
-    std::string token;
-    std::string lexeme;
+    char c;
     std::cout << "Token\t\tLexeme" << std::endl;
-    lexer(input);
+    input.get(c);
+    lexer(input,c);
     input.close();
     return 0;
 }
