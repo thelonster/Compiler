@@ -1,20 +1,21 @@
 #include "compiler.h"
 #include "macros.h"
 
-std::string lexer(std::ifstream& input, char c) {
-    std::string token;
-    bool floatflag = false, tokenfound = false, hashflag = false, keyflag = false;
+Token lexer(std::ifstream& input, char c) {
+    std::string lexeme;
+    Token token;
+    bool floatflag = false, tokenfound = false, hashflag = false;
     switch (getstate(c)) {
         //This case is for ID's
         case ID_STATE:
             //state 1 -> 2: adding letter then moving to second state
-            token += c;
+            lexeme += c;
             while (!tokenfound && input.get(c)) {
                 //This switch is the 2nd state that can move to the 3rd/4th/5th/6th state
                 switch (idstate(c)) {
                     //letter state
 	                case ID_LETTER:
-	                    token += c;
+	                    lexeme += c;
                         hashflag = false; //if a number is added, reset hashflag
 	                    //break moves from state 3/6 to state 2
 	                    break;
@@ -22,17 +23,18 @@ std::string lexer(std::ifstream& input, char c) {
                     case ID_POUND:
                         //Can't have 2 # signs in a row
                         if (hashflag) {
-                            //std::cout << "unknown\t" << token << std::endl;
-                            return "unknown\t" + token;
+                            token.lexeme = lexeme;
+                            token.token = "unknown";
+                            return token; //"unknown\t" + lexeme;
                             tokenfound = true;
                             break;
                         }
-                        token += c;
+                        lexeme += c;
                         hashflag = true;
                         break;
                     //number state
                     case ID_NUMBER:
-                        token += c;
+                        lexeme += c;
                         hashflag = false;
                         break;
                     //accepting state
@@ -40,17 +42,15 @@ std::string lexer(std::ifstream& input, char c) {
                         input.unget();
                         tokenfound = true;
                         for (auto it = keywords.begin(); it != keywords.end(); it++) {
-                            if (token == *it) {
-                                //std::cout << "keyword\t\t" << token << std::endl;
-                                return "keyword\t\t" + token;
-                                keyflag = true;
+                            if (lexeme == *it) {
+                                token.lexeme = lexeme;
+                                token.token = "keyword";
+                                return token; //"keyword\t\t" + lexeme;
                             }
                         }
-                        if (!keyflag)
-                            //std::cout << "identifier\t" << token << std::endl;
-                            return "identifier\t" + token;
-                        keyflag = false;
-                        token = "";
+                        token.lexeme = lexeme;
+                        token.token = "identifier";
+                        return token; //"identifier\t" + lexeme;
                         break;
                 }
             }
@@ -62,25 +62,26 @@ std::string lexer(std::ifstream& input, char c) {
                 switch (numstate(c)) {
                     //number state
                     case NUM_NUMBER:
-                        token += c;
+                        lexeme += c;
                         break;
                     //period state
                     case NUM_PERIOD:
                         floatflag = true;
-                        token += c;
+                        lexeme += c;
                         break;
                     //accepting state
                     default:
                         input.unget();
-                        if (floatflag)
-                            //std::cout << "float\t\t" << token << std::endl;
-                            return "real\t\t" + token;
-                        else
-                            //std::cout << "int\t\t" << token << std::endl;
-                            return "int\t\t" + token;
-                        floatflag = false;
-                        token = "";
-                        tokenfound = true;
+                        if (floatflag) {
+                            token.lexeme = lexeme;
+                            token.token = "real";
+                            return token; //"real\t\t" + lexeme;
+                        }                            
+                        else {
+                            token.lexeme = lexeme;
+                            token.token = "int";
+                            return token; //"int\t\t" + lexeme;
+                        }
                         break;
                 }
             } while (!tokenfound && input.get(c));
@@ -88,29 +89,32 @@ std::string lexer(std::ifstream& input, char c) {
         //state for operators & separators (also blank spaces)
         default:
             if (isseparator(c)) {
-                token += c;
+                lexeme += c;
                 input.get(c);
                 if (isseparator(c))
-                    token += c;
+                    lexeme += c;
                 else
                     input.unget();
-                //std::cout << "separator\t" << token << std::endl;
-                return "separator\t" + token;
-                token = "";
+                token.lexeme = lexeme;
+                token.token = "separator";
+                return token; //"separator\t" + lexeme;
             }
             else if (isoperator(c)) {
-                token += c;
+                lexeme += c;
                 input.get(c);
                 if (isoperator(c))
-                    token += c;
+                    lexeme += c;
                 else
                     input.unget();
-                //std::cout << "operator\t" << token << std::endl;
-                return "operator\t" + token;
-                token = "";
+                token.lexeme = lexeme;
+                token.token = "operator";
+                return token; //"operator\t" + lexeme;
             }
-            else
-                return "";
+            else {
+                token.lexeme = "";
+                token.token = "";
+                return token;
+            }
             break;
     }
 }
@@ -162,12 +166,12 @@ int main() {
     std::ifstream input;
     input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
     char c;
-    std::string tokenlexeme;
-    std::cout << "Token\t\tLexeme" << std::endl;
+    Token token;
+    std::cout << std::setw(16) << std::left <<"Token" << "Lexeme" << std::endl;
     while (input.get(c)) {
-        tokenlexeme = lexer(input, c);
-        if (tokenlexeme != "")
-            std::cout << tokenlexeme << std::endl;
+        token = lexer(input, c);
+        if (token.lexeme != "")
+            std::cout << std::setw(16) << std::left << token.token << token.lexeme << std::endl;
     }
     input.close();
     return 0;
