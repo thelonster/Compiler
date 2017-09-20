@@ -12,7 +12,7 @@ struct Token {
     std::string lexeme;
 };
 
-std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write" };
+std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@' };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
 std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };

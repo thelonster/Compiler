@@ -88,34 +88,29 @@ Token lexer(std::ifstream& input, char c) {
             } while (!tokenfound && input.get(c));
             break;
         //state for operators & separators (also blank spaces)
+        case OP_STATE:
+            lexeme += c;
+            input.get(c);
+            if (isoperator(c))
+                lexeme += c;
+            else
+                input.unget();
+            token.lexeme = lexeme;
+            token.token = "operator";
+            break;
+        case SEP_STATE:
+            lexeme += c;
+            input.get(c);
+            if (isseparator(c))
+                lexeme += c;
+            else
+                input.unget();
+            token.lexeme = lexeme;
+            token.token = "separator";
+            break;
         default:
-            if (isseparator(c)) {
-                lexeme += c;
-                input.get(c);
-                if (isseparator(c))
-                    lexeme += c;
-                else
-                    input.unget();
-                token.lexeme = lexeme;
-                token.token = "separator";
-                tokenfound = true; //return token; //"separator\t" + lexeme;
-            }
-            else if (isoperator(c)) {
-                lexeme += c;
-                input.get(c);
-                if (isoperator(c))
-                    lexeme += c;
-                else
-                    input.unget();
-                token.lexeme = lexeme;
-                token.token = "operator";
-                tokenfound = true;// return token; //"operator\t" + lexeme;
-            }
-            else {
-                token.lexeme = "";
-                token.token = "";
-                tokenfound = true;// return token;
-            }
+            token.lexeme = "";
+            token.token = "";
             break;
     }
     return token;
