@@ -4,38 +4,32 @@
 Token lexer(std::ifstream& input, char c) {
     std::string lexeme;
     Token token;
-    bool floatflag = false, tokenfound = false, hashflag = false;
+    bool tokenfound = false;
     switch (getstate(c)) {
         //This case is for ID's
         case ID_STATE:
             //state 1 -> 2: adding letter then moving to second state
             lexeme += c;
             while (!tokenfound && input.get(c)) {
-                //This switch is the 2nd state that can move to the 3rd/4th/5th/6th state
+                //This switch is the 2nd state that can move to the 3rd/5th/8th/9th state
                 switch (idstate(c)) {
                     //letter state
 	                case ID_LETTER:
 	                    lexeme += c;
-                        hashflag = false; //if a number is added, reset hashflag
-	                    //break moves from state 3/6 to state 2
 	                    break;
                     //# state
                     case ID_POUND:
-                        //Can't have 2 # signs in a row
-                        if (hashflag) {
-                            token.lexeme = lexeme;
-                            token.token = "unknown";
-                            return token; //"unknown\t" + lexeme;
-                            tokenfound = true;
-                            break;
+                        lexeme += c;
+                        if (input.get(c) && isletter(c)) {
+                            lexeme += c;
                         }
-                        lexeme += c;
-                        hashflag = true;
-                        break;
-                    //number state
-                    case ID_NUMBER:
-                        lexeme += c;
-                        hashflag = false;
+                        else {
+                            input.unget();
+                            tokenfound = true;
+                            token.lexeme = lexeme;
+                            token.token = "identifier";
+                            tokenfound = true;// return token;
+                        }
                         break;
                     //accepting state
                     default:
@@ -45,12 +39,15 @@ Token lexer(std::ifstream& input, char c) {
                             if (lexeme == *it) {
                                 token.lexeme = lexeme;
                                 token.token = "keyword";
-                                return token; //"keyword\t\t" + lexeme;
+                                tokenfound = true;// return token; //"keyword\t\t" + lexeme;
                             }
                         }
-                        token.lexeme = lexeme;
-                        token.token = "identifier";
-                        return token; //"identifier\t" + lexeme;
+                        if (token.token != "keyword") {
+                            token.lexeme = lexeme;
+                            token.token = "identifier";
+                        }
+                        tokenfound = true;
+                        //return token; //"identifier\t" + lexeme;
                         break;
                 }
             }
@@ -66,22 +63,26 @@ Token lexer(std::ifstream& input, char c) {
                         break;
                     //period state
                     case NUM_PERIOD:
-                        floatflag = true;
                         lexeme += c;
+                        while (!tokenfound && input.get(c)) {
+                            switch (floatstate(c)) {
+                                case FLOAT_NUMBER:
+                                    lexeme += c;
+                                    break;
+                                default:
+                                    input.unget();
+                                    token.lexeme = lexeme;
+                                    token.token = "real";
+                                    tokenfound = true;
+                            }
+                        }
                         break;
                     //accepting state
                     default:
                         input.unget();
-                        if (floatflag) {
-                            token.lexeme = lexeme;
-                            token.token = "real";
-                            return token; //"real\t\t" + lexeme;
-                        }                            
-                        else {
-                            token.lexeme = lexeme;
-                            token.token = "int";
-                            return token; //"int\t\t" + lexeme;
-                        }
+                        token.lexeme = lexeme;
+                        token.token = "int";
+                        tokenfound = true;
                         break;
                 }
             } while (!tokenfound && input.get(c));
@@ -97,7 +98,7 @@ Token lexer(std::ifstream& input, char c) {
                     input.unget();
                 token.lexeme = lexeme;
                 token.token = "separator";
-                return token; //"separator\t" + lexeme;
+                tokenfound = true; //return token; //"separator\t" + lexeme;
             }
             else if (isoperator(c)) {
                 lexeme += c;
@@ -108,15 +109,16 @@ Token lexer(std::ifstream& input, char c) {
                     input.unget();
                 token.lexeme = lexeme;
                 token.token = "operator";
-                return token; //"operator\t" + lexeme;
+                tokenfound = true;// return token; //"operator\t" + lexeme;
             }
             else {
                 token.lexeme = "";
                 token.token = "";
-                return token;
+                tokenfound = true;// return token;
             }
             break;
     }
+    return token;
 }
 
 int getstate(char c) {
@@ -124,8 +126,12 @@ int getstate(char c) {
         return ID_STATE;
     else if (isnumber(c))
         return NUMBER_STATE;
+    else if (isoperator(c))
+        return OP_STATE;
+    else if (isseparator(c))
+        return SEP_STATE;
     else
-        return -1;
+        return EXIT_STATE;
 }
 
 int numstate(char c) {
@@ -134,18 +140,23 @@ int numstate(char c) {
     else if (c == '.')
         return NUM_PERIOD;
     else
-        return -1;
+        return EXIT_STATE;
 }
 
 int idstate(char c) {
-    if (isalpha(c))
+    if (isletter(c))
         return ID_LETTER;
     else if (c == '#')
         return ID_POUND;
-    else if (isdigit(c))
-        return ID_NUMBER;
     else
-        return -1;
+        return EXIT_STATE;
+}
+
+int floatstate(char c) {
+    if (isnumber(c))
+        return FLOAT_NUMBER;
+    else
+        return EXIT_STATE;
 }
 
 bool isseparator(char c) {

@@ -24,8 +24,10 @@ Token lexer(std::ifstream& input, char c);
 int getstate(char c);
 /*Returns whether a number, period, or other character is found and goes to that state*/
 int numstate(char c);
-/*Returns whether a letter, '#', or number is found and goes to that state*/
+/*Returns whether a letter, or '#' is found and goes to that state*/
 int idstate(char c);
+/*Returns whether a number or other character is found and goes to that state*/
+int floatstate(char c);
 /*Returns true if character is a separator as defined in vector above*/
 bool isseparator(char c);
 /*Returns true if character is a operator as defined in vector above*/
