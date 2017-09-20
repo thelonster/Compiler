@@ -120,9 +120,9 @@ Token lexer(std::ifstream& input, char c) {
 }
 
 int getstate(char c) {
-    if (isalpha(c))
+    if (isletter(c))
         return ID_STATE;
-    else if (isdigit(c))
+    else if (isnumber(c))
         return NUMBER_STATE;
     else
         return -1;
@@ -157,6 +157,20 @@ bool isseparator(char c) {
 
 bool isoperator(char c) {
     for (auto it = operators.begin(); it != operators.end(); it++)
+        if (*it == c)
+            return true;
+    return false;
+}
+
+bool isletter(char c) {
+    for (auto it = letters.begin(); it != letters.end(); it++)
+        if (*it == c)
+            return true;
+    return false;
+}
+
+bool isnumber(char c) {
+    for (auto it = numbers.begin(); it != numbers.end(); it++)
         if (*it == c)
             return true;
     return false;
