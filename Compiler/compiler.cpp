@@ -28,7 +28,7 @@ Token lexer(std::ifstream& input, char c) {
                             tokenfound = true;
                             token.lexeme = lexeme;
                             token.token = "identifier";
-                            tokenfound = true;// return token;
+                            tokenfound = true;
                         }
                         break;
                     //accepting state
@@ -39,7 +39,7 @@ Token lexer(std::ifstream& input, char c) {
                             if (lexeme == *it) {
                                 token.lexeme = lexeme;
                                 token.token = "keyword";
-                                tokenfound = true;// return token; //"keyword\t\t" + lexeme;
+                                tokenfound = true;
                             }
                         }
                         if (token.token != "keyword") {
@@ -47,15 +47,16 @@ Token lexer(std::ifstream& input, char c) {
                             token.token = "identifier";
                         }
                         tokenfound = true;
-                        //return token; //"identifier\t" + lexeme;
                         break;
                 }
             }
             break;
         //This state is for ints and floats
         case NUMBER_STATE:
-            do {
-                //This switch is the 1st state where is can move to the 2nd/3rd/4th state
+            //instead of d+, my FSM is dd*, which is equivalent to d+
+            lexeme += c; //state 1 -> 2
+            while (!tokenfound && input.get(c)) {
+                //This switch is the 2nd state where is can move to the 3rd/4th/5th states
                 switch (numstate(c)) {
                     //number state
                     case NUM_NUMBER:
@@ -85,7 +86,7 @@ Token lexer(std::ifstream& input, char c) {
                         tokenfound = true;
                         break;
                 }
-            } while (!tokenfound && input.get(c));
+            } 
             break;
         //state for operators & separators (also blank spaces)
         case OP_STATE:
@@ -130,7 +131,7 @@ int getstate(char c) {
 }
 
 int numstate(char c) {
-    if (isdigit(c))
+    if (isnumber(c))
         return NUM_NUMBER;
     else if (c == '.')
         return NUM_PERIOD;
