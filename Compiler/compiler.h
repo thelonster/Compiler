@@ -36,6 +36,8 @@ bool isoperator(char c);
 bool isletter(char c);
 /*Returns true if character is a number as defined in vector above*/
 bool isnumber(char c);
+/*Returns true if string is a keyword*/
+bool iskeyword(std::string s);
 /*runs the lexer*/
 int main();
 #endif // !COMPILER_H

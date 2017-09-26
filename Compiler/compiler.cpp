@@ -35,14 +35,11 @@ Token lexer(std::ifstream& input, char c) {
                     default:
                         input.unget();
                         tokenfound = true;
-                        for (auto it = keywords.begin(); it != keywords.end(); it++) {
-                            if (lexeme == *it) {
-                                token.lexeme = lexeme;
-                                token.token = "keyword";
-                                tokenfound = true;
-                            }
+                        if (iskeyword(lexeme)) {
+                            token.lexeme = lexeme;
+                            token.token = "keyword";
                         }
-                        if (token.token != "keyword") {
+                        else { //if (token.token != "keyword") {
                             token.lexeme = lexeme;
                             token.token = "identifier";
                         }
@@ -179,6 +176,13 @@ bool isletter(char c) {
 bool isnumber(char c) {
     for (auto it = numbers.begin(); it != numbers.end(); it++)
         if (*it == c)
+            return true;
+    return false;
+}
+
+bool iskeyword(std::string s) {
+    for (auto it = keywords.begin(); it != keywords.end(); it++)
+        if (*it == s)
             return true;
     return false;
 }
