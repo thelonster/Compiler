@@ -223,19 +223,22 @@ int main(int argc, const char* argv[]) {
         std::cout << "Please specify a text file to run through the lexical analyzer" << std::endl;
         return 0;
     }
-    input.open(argv[1]);
-    if (!input.is_open()) {
-        std::cout << "Please enter a correct file name to run through the lexical analyzer" << std::endl;
-        return 0;
+    for (int i = 1; i < argc; i++) {
+        input.open(argv[i]);
+        if (!input.is_open()) {
+            std::cout << "Please enter a correct file name to run through the lexical analyzer" << std::endl;
+            break;
+        }
+        char c;
+        Token token;
+        std::cout << std::endl << "========== Running " << argv[i] << " through the lexer ==========" << std::endl << std::endl;
+        std::cout << std::setw(16) << std::left << "Token" << "Lexeme" << std::endl;
+        while (input.get(c)) {
+            token = lexer(input, c);
+            if (token.lexeme != "")
+                std::cout << std::setw(16) << std::left << token.token << token.lexeme << std::endl;
+        }
+        input.close();
     }
-    char c;
-    Token token;
-    std::cout << std::setw(16) << std::left << "Token" << "Lexeme" << std::endl;
-    while (input.get(c)) {
-        token = lexer(input, c);
-        if (token.lexeme != "")
-            std::cout << std::setw(16) << std::left << token.token << token.lexeme << std::endl;
-    }
-    input.close();
     return 0;
 }
