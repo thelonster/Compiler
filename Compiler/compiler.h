@@ -16,7 +16,7 @@ std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "retur
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '!' };
-std::vector<std::string> multioperators = { "+=", "-=", "*=", "/=", "==", "<=", ">=" };
+std::vector<std::string> multioperators = { "+=", "-=", "*=", "/=", "==", "<=", ">=", ":=" };
 std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 

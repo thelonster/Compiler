@@ -230,7 +230,7 @@ int main(int argc, const char* argv[]) {
     }
     char c;
     Token token;
-    std::cout << std::setw(16) << std::left <<"Token" << "Lexeme" << std::endl;
+    std::cout << std::setw(16) << std::left << "Token" << "Lexeme" << std::endl;
     while (input.get(c)) {
         token = lexer(input, c);
         if (token.lexeme != "")
