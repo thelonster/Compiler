@@ -89,8 +89,13 @@ Token lexer(std::ifstream& input, char c) {
         case OP_STATE:
             lexeme += c;
             input.get(c);
-            if (isoperator(c))
+            if (isoperator(c)) {
                 lexeme += c;
+                if (!isoperator(lexeme)) {
+                    lexeme.pop_back();
+                    input.unget();
+                }
+            }
             else
                 input.unget();
             token.lexeme = lexeme;
@@ -99,16 +104,27 @@ Token lexer(std::ifstream& input, char c) {
         case SEP_STATE:
             lexeme += c;
             input.get(c);
-            if (isseparator(c))
+            if (isseparator(c)) {
                 lexeme += c;
+                if (!isseparator(lexeme)) {
+                    lexeme.pop_back();
+                    input.unget();
+                }
+            }
             else
                 input.unget();
             token.lexeme = lexeme;
             token.token = "separator";
             break;
         default:
-            token.lexeme = "";
-            token.token = "";
+            if (isspace(c)) {
+                token.lexeme = "";
+                token.token = "";
+            }
+            else {
+                token.lexeme = c;
+                token.token = "unknown";
+            }
             break;
     }
     return token;
@@ -159,9 +175,23 @@ bool isseparator(char c) {
     return false;
 }
 
+bool isseparator(std::string s) {
+    for (auto it = multiseparators.begin(); it != multiseparators.end(); it++)
+        if (*it == s)
+            return true;
+    return false;
+}
+
 bool isoperator(char c) {
     for (auto it = operators.begin(); it != operators.end(); it++)
         if (*it == c)
+            return true;
+    return false;
+}
+
+bool isoperator(std::string s) {
+    for (auto it = multioperators.begin(); it != multioperators.end(); it++)
+        if (*it == s)
             return true;
     return false;
 }
@@ -187,9 +217,14 @@ bool iskeyword(std::string s) {
     return false;
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
     std::ifstream input;
-    input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
+    if (argc < 2) {
+        std::cout << "Please specify a text file to run through the lexical analyzer" << std::endl;
+        return 0;
+    }
+    input.open(argv[1]);
+    //input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
     char c;
     Token token;
     std::cout << std::setw(16) << std::left <<"Token" << "Lexeme" << std::endl;
