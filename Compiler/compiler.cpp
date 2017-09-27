@@ -224,7 +224,10 @@ int main(int argc, const char* argv[]) {
         return 0;
     }
     input.open(argv[1]);
-    //input.open("C:\\Users\\Lonnie\\Source\\Repos\\Compiler\\Compiler\\test.txt");
+    if (!input.is_open()) {
+        std::cout << "Please enter a correct file name to run through the lexical analyzer" << std::endl;
+        return 0;
+    }
     char c;
     Token token;
     std::cout << std::setw(16) << std::left <<"Token" << "Lexeme" << std::endl;
