@@ -1,4 +1,6 @@
 # Compiler
 Compiler made from the ground up for CPSC 323 
 
-I'm just working on making a Lexer at the moment.
+Currently the Lexical Analyzer is working.
+
+Starting work on Syntax Analyzer using a table driven RDP.
