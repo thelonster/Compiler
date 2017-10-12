@@ -21,7 +21,7 @@
     <ClInclude Include="..\macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="syntaxer.h">
+    <ClInclude Include="..\syntaxer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClCompile Include="..\compiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syntaxer.cpp">
+    <ClCompile Include="..\syntaxer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
