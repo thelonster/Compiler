@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <stack>
 
 struct Token {
     std::string token;
@@ -20,6 +21,8 @@ std::vector<std::string> multioperators = { "+=", "-=", "*=", "/=", "==", "<=", 
 std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
                               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+std::stack<std::string> TDPPstack;
+std::string table[38][26][10];
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
@@ -43,6 +46,10 @@ bool isletter(char c);
 bool isnumber(char c);
 /*Returns true if string is a keyword*/
 bool iskeyword(std::string s);
+/*Converts non-terminal character to index in the table*/
+int nonterminalindex(std::string nt);
+/*Converts terminal character to index in the table*/
+int terminalindex(std::string t);
 /*runs the lexer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H
