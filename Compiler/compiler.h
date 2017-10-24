@@ -13,7 +13,7 @@ struct Token {
     std::string lexeme;
 };
 
-std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "floating", "boolean", "true", "false" };
+std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
 std::vector<char> operators = { '+', '-', '/', '*', '<', '>', '=', ':', '|' };
@@ -22,7 +22,7 @@ std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
                               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 std::stack<std::string> TDPPstack;
-std::string table[38][26][10];
+std::string table[38][32][10];
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
@@ -50,6 +50,12 @@ bool iskeyword(std::string s);
 int nonterminalindex(std::string nt);
 /*Converts terminal character to index in the table*/
 int terminalindex(std::string t);
+/*Returns whether the string is a non-terminal character or not*/
+bool isnonterminal(std::string st);
+/*Fills table with correct values*/
+void filltable();
+/*Syntax analyzer driver for Table Driver Predictive Parser*/
+void syntaxerdriver();
 /*runs the lexer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H
