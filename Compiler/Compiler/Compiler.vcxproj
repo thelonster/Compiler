@@ -116,9 +116,11 @@
   <ItemGroup>
     <ClInclude Include="..\compiler.h" />
     <ClInclude Include="..\macros.h" />
+    <ClInclude Include="..\syntaxer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\compiler.cpp" />
+    <ClCompile Include="..\syntaxer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test.txt" />
