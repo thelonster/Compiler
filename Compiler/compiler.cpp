@@ -578,6 +578,25 @@ void filltable() {
     table[37][31][0] = "e";
 }
 
+void syntaxerdriver() {
+    TDPPstack.push("$");
+    std::vector<Token> inputstring;
+    char c;
+    std::ifstream input;
+    input.open("test.txt");
+    while (input.get(c))
+        inputstring.push_back(lexer(input, c));
+    Token temp;
+    temp.lexeme = "$";
+    temp.token = "EOF";
+    inputstring.push_back(temp);
+    int index = 0;
+    TDPPstack.push(inputstring[index++].lexeme);
+    while (!TDPPstack.empty()) {
+        
+    }
+}
+
 int main(int argc, const char* argv[]) {
     std::ifstream input;
     if (argc < 2) {
