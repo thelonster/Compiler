@@ -578,6 +578,17 @@ void filltable() {
     table[37][31][0] = "e";
 }
 
+int lastprodindex(int r, int c) {
+    int index = 0;
+    for (int a = 0; a < 7; a++) {
+        if (table[r][c][a] != "")
+            index = a;
+        else
+            break;
+    }
+    return index;
+}
+
 void syntaxerdriver() {
     TDPPstack.push("$");
     std::vector<Token> inputstring;
@@ -593,7 +604,28 @@ void syntaxerdriver() {
     int index = 0;
     TDPPstack.push(inputstring[index++].lexeme);
     while (!TDPPstack.empty()) {
-        
+        std::string t = TDPPstack.top();
+        Token i = inputstring[index];
+        if (!isnonterminal(t)) {
+            if (t == i.lexeme) {
+                TDPPstack.pop();
+                i = inputstring[index++];
+            }
+            else
+                std::cout << "Expected " << t << " but got " << i.lexeme << "instead" << std::endl;
+        }
+        else {
+            int r = nonterminalindex(t);
+            int c = terminalindex(i.lexeme);
+            if (table[r][c][0] != "") {
+                TDPPstack.pop();
+                for (int h = lastprodindex(r, c); h > 0; h--)
+                    TDPPstack.push(table[r][c][h]);
+            }
+            else {
+                std::cout << "Incorrect syntax" << std::endl;
+            }
+        }
     }
 }
 
