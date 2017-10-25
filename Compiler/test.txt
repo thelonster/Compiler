@@ -1,4 +1,4 @@
-while (fahr#x  < upper)   a := 23.00
+
 @ convert  (fahr : integer)
 {
            return 5*(fahr -32)/9;
