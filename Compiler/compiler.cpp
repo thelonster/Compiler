@@ -305,12 +305,13 @@ int terminalindex(std::string t) {
     else if (t == ":") { return 31; }
     else if (t == "]") { return 32; }
     else if (t == "}") { return 33; }
-    else if (t == "$") { return 34; }
+    else if (t == "[") { return 34; }
+    else if (t == "$") { return 35; }
     else { return -1; }
 }
 
 bool isnonterminal(std::string st) {
-    if (st[0] == '<')
+    if (st[0] == '<' && st.size() > 1)
         return true;
     return false;
 }
@@ -324,7 +325,7 @@ void filltable() {
     table[0][0][1] = "%%";
     table[0][0][2] = "<OPT_DL>";
     table[0][0][3] = "<SL>";
-    table[0][34][0] = "e";
+    table[0][35][0] = "e";
     table[1][0][0] = "<FD>";
     table[1][27][0] = "e";
     table[1][30][0] = "<EPS>";
@@ -401,10 +402,21 @@ void filltable() {
     table[16][26][0] = ",";
     table[16][26][1] = "<ID>";
     table[16][13][0] = "e";
+    table[16][14][0] = "e";
+    table[16][17][0] = "e";
+    table[16][18][0] = "e";
+    table[16][19][0] = "e";
+    table[16][20][0] = "e";
+    table[16][21][0] = "e";
+    table[16][22][0] = "e";
     table[16][28][0] = "e";
+    table[16][29][0] = "e";
     table[16][30][0] = "<EPS>";
     table[16][31][0] = "e";
     table[16][32][0] = "e";
+    table[16][34][0] = "[";
+    table[16][34][1] = "<ID>";
+    table[16][34][2] = "]";
     table[17][1][0] = "<S>";
     table[17][1][1] = "<SL'>";
     table[17][5][0] = "<S>";
@@ -428,6 +440,7 @@ void filltable() {
     table[18][12][0] = "<SL>";
     table[18][30][0] = "<EPS>";
     table[18][33][0] = "e";
+    table[18][35][0] = "e";
     table[19][1][0] = "<A>";
     table[19][5][0] = "<COM>";
     table[19][6][0] = "<IF>";
@@ -435,13 +448,13 @@ void filltable() {
     table[19][10][0] = "<WR>";
     table[19][11][0] = "<RD>";
     table[19][12][0] = "<WH>";
-    table[20][2][0] = "{";
-    table[20][2][1] = "<SL>";
-    table[20][2][2] = "}";
+    table[20][5][0] = "{";
+    table[20][5][1] = "<SL>";
+    table[20][5][2] = "}";
     table[21][1][0] = "id";
-    table[21][1][0] = ":=";
-    table[21][1][0] = "<EX>";
-    table[21][1][0] = ";";
+    table[21][1][1] = ":=";
+    table[21][1][2] = "<EX>";
+    table[21][1][3] = ";";
     table[22][6][0] = "if";
     table[22][6][1] = "(";
     table[22][6][2] = "<COND>";
@@ -474,10 +487,10 @@ void filltable() {
     table[26][10][3] = ")";
     table[26][10][4] = ";";
     table[27][11][0] = "read";
-    table[27][11][0] = "(";
-    table[27][11][0] = "<ID>";
-    table[27][11][0] = ")";
-    table[27][11][0] = ";";
+    table[27][11][1] = "(";
+    table[27][11][2] = "<ID>";
+    table[27][11][3] = ")";
+    table[27][11][4] = ";";
     table[28][12][0] = "while";
     table[28][12][1] = "(";
     table[28][12][2] = "<COND>";
@@ -597,7 +610,7 @@ void filltable() {
     table[36][24][0] = "true";
     table[36][24][0] = "false";
     table[37][30][0] = "e";
-    table[37][34][0] = "e";
+    table[37][35][0] = "e";
 }
 
 int lastprodindex(int r, int c) {
@@ -615,16 +628,18 @@ void syntaxerdriver() {
     filltable();
     TDPPstack.push("$");
     std::vector<Token> inputstring;
-    char ch;
+    char ch = 0;
     std::ifstream input;
     input.open("C:/Users/Lonnie/Source/Repos/Compiler/Compiler/test.txt");
     linenumber = 0;
     //Adding tokens to a vector so that I don't need to worry about ch and input later.
+    
     while (input.get(ch)) {
         Token temptok = lexer(input, ch);
         if (temptok.lexeme != "")
             inputstring.push_back(temptok);
     }
+    
     Token temp;
     temp.lexeme = "$";
     temp.token = "EOF";
@@ -633,13 +648,19 @@ void syntaxerdriver() {
     TDPPstack.push("<RAT>");
     Token i = inputstring[index];
     std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
-    while (!TDPPstack.empty()) {
-        std::string t = TDPPstack.top();
+    std::string t;
+    while (TDPPstack.top() != "$") {
+        t = TDPPstack.top();
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
                 TDPPstack.pop();
                 i = inputstring[++index];
-                std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
+                /*
+                i = lexer(input, ch);// inputstring[++index];
+                while (i.lexeme == "")
+                    i = lexer(input, ch);
+                */
+                std::cout << "Token: " << std::setw(10) << std::left << i.token << " Lexeme: " << i.lexeme << std::endl;
             }
             else {
                 //If the top of the stack is epsilon, pop and continue
@@ -675,6 +696,8 @@ void syntaxerdriver() {
             }
         }
     }
+    std::cout << "Stack empty, Syntax correct!" << std::endl;
+    input.close();
 }
 
 int main(int argc, const char* argv[]) {

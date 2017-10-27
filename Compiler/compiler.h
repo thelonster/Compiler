@@ -24,7 +24,7 @@ std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
                               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 std::stack<std::string> TDPPstack;
-std::string table[38][35][7];
+std::string table[38][36][7];
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
