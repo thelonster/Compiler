@@ -27,7 +27,8 @@ Token lexer(std::ifstream& input, char c) {
                             input.unget();
                             tokenfound = true;
                             token.lexeme = lexeme;
-                            token.token = "identifier";
+                            token.token = "id";
+                            token.lineno = linenumber;
                             tokenfound = true;
                         }
                         break;
@@ -38,10 +39,12 @@ Token lexer(std::ifstream& input, char c) {
                         if (iskeyword(lexeme)) {
                             token.lexeme = lexeme;
                             token.token = "keyword";
+                            token.lineno = linenumber;
                         }
                         else { //if (token.token != "keyword") {
                             token.lexeme = lexeme;
-                            token.token = "identifier";
+                            token.token = "id";
+                            token.lineno = linenumber;
                         }
                         tokenfound = true;
                         break;
@@ -71,6 +74,7 @@ Token lexer(std::ifstream& input, char c) {
                                     input.unget();
                                     token.lexeme = lexeme;
                                     token.token = "real";
+                                    token.lineno = linenumber;
                                     tokenfound = true;
                             }
                         }
@@ -80,6 +84,7 @@ Token lexer(std::ifstream& input, char c) {
                         input.unget();
                         token.lexeme = lexeme;
                         token.token = "int";
+                        token.lineno = linenumber;
                         tokenfound = true;
                         break;
                 }
@@ -100,6 +105,7 @@ Token lexer(std::ifstream& input, char c) {
                 input.unget();
             token.lexeme = lexeme;
             token.token = "operator";
+            token.lineno = linenumber;
             break;
         case SEP_STATE:
             lexeme += c;
@@ -115,15 +121,20 @@ Token lexer(std::ifstream& input, char c) {
                 input.unget();
             token.lexeme = lexeme;
             token.token = "separator";
+            token.lineno = linenumber;
             break;
         default:
             if (isspace(c)) {
+                if (c == '\n')
+                    linenumber++;
                 token.lexeme = "";
                 token.token = "";
+                token.lineno = linenumber;
             }
             else {
                 token.lexeme = c;
                 token.token = "unknown";
+                token.lineno = linenumber;
             }
             break;
     }
@@ -291,26 +302,28 @@ int terminalindex(std::string t) {
     else if (t == ")") { return 28; }
     else if (t == ";") { return 29; }
     else if (t == "e") { return 30; }
-    else if (t == "$") { return 31; }
+    else if (t == ":") { return 31; }
+    else if (t == "]") { return 32; }
+    else if (t == "$") { return 33; }
     else { return -1; }
 }
 
 bool isnonterminal(std::string st) {
-    if (st.find("<"))
+    if (st[0] == '<')
         return true;
     return false;
 }
 
 void filltable() {
     for (int l = 0; l < 38; l++)
-        for (int w = 0; w < 32; w++)
-            for (int h = 0; h < 10; h++)
+        for (int w = 0; w < 34; w++)
+            for (int h = 0; h < 7; h++)
                 table[l][w][h] = "";
     table[0][0][0] = "<OPT_FD>";
     table[0][0][1] = "%%";
     table[0][0][2] = "<OPT_DL>";
     table[0][0][3] = "<SL>";
-    table[0][31][0] = "e";
+    table[0][33][0] = "e";
     table[1][0][0] = "<FD>";
     table[1][27][0] = "e";
     table[1][30][0] = "<EPS>";
@@ -385,7 +398,10 @@ void filltable() {
     table[15][1][1] = "<ID'>";
     table[16][26][0] = ",";
     table[16][26][1] = "<ID>";
+    table[16][28][0] = "e";
     table[16][30][0] = "<EPS>";
+    table[16][31][0] = "e";
+    table[16][32][0] = "e";
     table[17][1][0] = "<S>";
     table[17][1][1] = "<SL'>";
     table[17][5][0] = "<S>";
@@ -575,7 +591,7 @@ void filltable() {
     table[36][24][0] = "true";
     table[36][24][0] = "false";
     table[37][30][0] = "e";
-    table[37][31][0] = "e";
+    table[37][33][0] = "e";
 }
 
 int lastprodindex(int r, int c) {
@@ -590,40 +606,65 @@ int lastprodindex(int r, int c) {
 }
 
 void syntaxerdriver() {
+    filltable();
     TDPPstack.push("$");
     std::vector<Token> inputstring;
-    char c;
+    char ch;
     std::ifstream input;
-    input.open("test.txt");
-    while (input.get(c))
-        inputstring.push_back(lexer(input, c));
+    input.open("C:/Users/Lonnie/Source/Repos/Compiler/Compiler/test.txt");
+    linenumber = 0;
+    while (input.get(ch)) {
+        Token temptok = lexer(input, ch);
+        if (temptok.lexeme != "")
+            inputstring.push_back(temptok);
+    }
     Token temp;
     temp.lexeme = "$";
     temp.token = "EOF";
     inputstring.push_back(temp);
     int index = 0;
-    TDPPstack.push(inputstring[index++].lexeme);
+    TDPPstack.push("<RAT>");
+    Token i = inputstring[index];
+    std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
     while (!TDPPstack.empty()) {
         std::string t = TDPPstack.top();
-        Token i = inputstring[index];
         if (!isnonterminal(t)) {
-            if (t == i.lexeme) {
+            if (t == i.lexeme || t == i.token) {
                 TDPPstack.pop();
-                i = inputstring[index++];
+                i = inputstring[++index];
+                std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
             }
-            else
-                std::cout << "Expected " << t << " but got " << i.lexeme << "instead" << std::endl;
+            else {
+                //If the top of the stack is epsilon, pop and continue
+                if (t == "e") {
+                    TDPPstack.pop();
+                    continue;
+                }
+                std::cout << "Line " << i.lineno << " Expected " << t << " but got " << i.lexeme << " instead" << std::endl;
+                return;
+            }
         }
         else {
+            //gets the row of the non-terminal
             int r = nonterminalindex(t);
+            //gets the row of the terminal if the terminal character is a keyword, operator, or separator
             int c = terminalindex(i.lexeme);
+            if (c == -1)
+                //if the terminal is an integer, real, or identifier, get the index of the token type instead
+                c = terminalindex(i.token);
             if (table[r][c][0] != "") {
+                int lpi = lastprodindex(r, c);
+                std::cout << t << " -> ";
+                for (int a = 0; a <= lpi; a++)
+                    std::cout << " " << table[r][c][a];
+                std::cout << std::endl;
                 TDPPstack.pop();
-                for (int h = lastprodindex(r, c); h > 0; h--)
+                for (int h = lpi; h >= 0; h--)
                     TDPPstack.push(table[r][c][h]);
             }
             else {
                 std::cout << "Incorrect syntax" << std::endl;
+                return;
             }
         }
     }
@@ -641,6 +682,7 @@ int main(int argc, const char* argv[]) {
             std::cout << "Please enter a correct file name to run through the lexical analyzer" << std::endl;
             break;
         }
+        linenumber = 0;
         char c;
         Token token;
         std::cout << std::endl << "========== Running " << argv[i] << " through the lexer ==========" << std::endl << std::endl;
@@ -651,6 +693,8 @@ int main(int argc, const char* argv[]) {
                 std::cout << std::setw(16) << std::left << token.token << token.lexeme << std::endl;
         }
         input.close();
+
+        syntaxerdriver();
     }
     return 0;
 }

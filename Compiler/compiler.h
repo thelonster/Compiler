@@ -11,8 +11,10 @@
 struct Token {
     std::string token;
     std::string lexeme;
+    int lineno = 0;
 };
 
+int linenumber;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
@@ -22,7 +24,7 @@ std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
                               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 std::stack<std::string> TDPPstack;
-std::string table[38][32][7];
+std::string table[38][34][7];
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
@@ -54,6 +56,8 @@ int terminalindex(std::string t);
 bool isnonterminal(std::string st);
 /*Fills table with correct values*/
 void filltable();
+/*Returns the index of the last production rule at [r][c] in the 3D table*/
+int lastprodindex(int r, int c);
 /*Syntax analyzer driver for Table Driver Predictive Parser*/
 void syntaxerdriver();
 /*runs the lexer*/
