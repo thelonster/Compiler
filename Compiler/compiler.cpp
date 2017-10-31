@@ -316,6 +316,46 @@ bool isnonterminal(std::string st) {
     return false;
 }
 
+std::string getterminal(int index) {
+    if (index == 0) { return "@"; }
+    else if (index == 1) { return "id"; }
+    else if (index == 2) { return "integer"; }
+    else if (index == 3) { return "boolean"; }
+    else if (index == 4) { return "real"; }
+    else if (index == 5) { return "{"; }
+    else if (index == 6) { return "if"; }
+    else if (index == 7) { return "fi"; }
+    else if (index == 8) { return "else"; }
+    else if (index == 9) { return "return"; }
+    else if (index == 10) { return "write"; }
+    else if (index == 11) { return "read"; }
+    else if (index == 12) { return "while"; }
+    else if (index == 13) { return "-"; }
+    else if (index == 14) { return "+"; }
+    else if (index == 15) { return "*"; }
+    else if (index == 16) { return "/"; }
+    else if (index == 17) { return "="; }
+    else if (index == 18) { return "/="; }
+    else if (index == 19) { return "=>"; }
+    else if (index == 20) { return "<="; }
+    else if (index == 21) { return "<"; }
+    else if (index == 22) { return ">"; }
+    else if (index == 23) { return "("; }
+    else if (index == 24) { return "true"; }
+    else if (index == 25) { return "false"; }
+    else if (index == 26) { return ","; }
+    else if (index == 27) { return "%%"; }
+    else if (index == 28) { return ")"; }
+    else if (index == 29) { return ";"; }
+    else if (index == 30) { return "e"; }
+    else if (index == 31) { return ":"; }
+    else if (index == 32) { return "]"; }
+    else if (index == 33) { return "}"; }
+    else if (index == 34) { return "["; }
+    else if (index == 35) { return "$"; }
+    else { return "\0"; }
+}
+
 void filltable() {
     for (int l = 0; l < 38; l++)
         for (int w = 0; w < 35; w++)
@@ -624,22 +664,20 @@ int lastprodindex(int r, int c) {
     return index;
 }
 
-void syntaxerdriver() {
+void syntaxerdriver(std::string filename) {
     filltable();
     TDPPstack.push("$");
     std::vector<Token> inputstring;
     char ch = 0;
     std::ifstream input;
-    input.open("C:/Users/Lonnie/Source/Repos/Compiler/Compiler/test.txt");
+    input.open(filename);// "C:/Users/Lonnie/Source/Repos/Compiler/Compiler/test.txt");
     linenumber = 0;
-    //Adding tokens to a vector so that I don't need to worry about ch and input later.
-    
+    //Adding tokens to a vector so that I don't need to worry about ch and input later.    
     while (input.get(ch)) {
         Token temptok = lexer(input, ch);
         if (temptok.lexeme != "")
             inputstring.push_back(temptok);
-    }
-    
+    }    
     Token temp;
     temp.lexeme = "$";
     temp.token = "EOF";
@@ -654,12 +692,7 @@ void syntaxerdriver() {
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
                 TDPPstack.pop();
-                i = inputstring[++index];
-                /*
-                i = lexer(input, ch);// inputstring[++index];
-                while (i.lexeme == "")
-                    i = lexer(input, ch);
-                */
+                i = inputstring[++index];               
                 std::cout << "Token: " << std::setw(10) << std::left << i.token << " Lexeme: " << i.lexeme << std::endl;
             }
             else {
@@ -682,7 +715,8 @@ void syntaxerdriver() {
                 c = terminalindex(i.token);
             if (table[r][c][0] != "") {
                 int lpi = lastprodindex(r, c);
-                std::cout << t << " -> ";
+                //prints out the production that corresponds with the token
+                std::cout << t << " ->";
                 for (int a = 0; a <= lpi; a++)
                     std::cout << " " << table[r][c][a];
                 std::cout << std::endl;
@@ -691,7 +725,13 @@ void syntaxerdriver() {
                     TDPPstack.push(table[r][c][h]);
             }
             else {
-                std::cout << "Incorrect syntax: top of stack: " << t << std::endl;
+                //Prints out error message
+                std::cout << "Line " << i.lineno << " Unexpected token found: " << i.lexeme << " Expecting: ";
+                //Prints out expected tokens based on first set of production
+                for (int a = 0; a < 35; a++)
+                    if (table[r][a][0] != "")
+                        std::cout << getterminal(a) << "|";
+                std::cout << '\b' << " " << std::endl;
                 return;
             }
         }
@@ -703,28 +743,20 @@ void syntaxerdriver() {
 int main(int argc, const char* argv[]) {
     std::ifstream input;
     if (argc < 2) {
-        std::cout << "Please specify a text file to run through the lexical analyzer" << std::endl;
+        std::cout << "Please specify a text file to run through the syntax analyzer" << std::endl;
         return 0;
     }
     for (int i = 1; i < argc; i++) {
         input.open(argv[i]);
         if (!input.is_open()) {
-            std::cout << "Please enter a correct file name to run through the lexical analyzer" << std::endl;
+            std::cout << "Please enter a correct file name to run through the syntax analyzer" << std::endl;
             break;
         }
         linenumber = 0;
         char c;
         Token token;
-        std::cout << std::endl << "========== Running " << argv[i] << " through the lexer ==========" << std::endl << std::endl;
-        std::cout << std::setw(16) << std::left << "Token" << "Lexeme" << std::endl;
-        while (input.get(c)) {
-            token = lexer(input, c);
-            if (token.lexeme != "")
-                std::cout << std::setw(16) << std::left << token.token << token.lexeme << std::endl;
-        }
-        input.close();
-
-        syntaxerdriver();
+        std::cout << std::endl << "========== Running " << argv[i] << " through the syntaxer ==========" << std::endl << std::endl;
+        syntaxerdriver(argv[i]);
     }
     return 0;
 }

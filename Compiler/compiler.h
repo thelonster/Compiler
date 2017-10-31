@@ -54,12 +54,14 @@ int nonterminalindex(std::string nt);
 int terminalindex(std::string t);
 /*Returns whether the string is a non-terminal character or not*/
 bool isnonterminal(std::string st);
+/*Returns a terminal character from an index*/
+std::string getterminal(int index);
 /*Fills table with correct values*/
 void filltable();
 /*Returns the index of the last production rule at [r][c] in the 3D table*/
 int lastprodindex(int r, int c);
 /*Syntax analyzer driver for Table Driver Predictive Parser*/
-void syntaxerdriver();
+void syntaxerdriver(std::string filename);
 /*runs the lexer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H
