@@ -235,7 +235,7 @@ int nonterminalindex(std::string nt) {
     else if (nt == "<Function Definitions Prime>") { return 3; }
     else if (nt == "<Function>") { return 4; }
     else if (nt == "<Opt Parameter List>") { return 5; }
-    else if (nt == "<PL>") { return 6; }
+    else if (nt == "<Parameter List>") { return 6; }
     else if (nt == "<Parameter List Prime>") { return 7; }
     else if (nt == "<Parameter>") { return 8; }
     else if (nt == "<Qualifier>") { return 9; }
@@ -388,7 +388,7 @@ void filltable() {
     table[6][1][0] = "<Parameter>";
     table[6][1][1] = "<Parameter List Prime>";
     table[7][26][0] = ",";
-    table[7][26][1] = "<PL>";
+    table[7][26][1] = "<Parameter List>";
     table[7][28][0] = "epsilon";
     table[7][30][0] = "<Empty>";
     table[8][1][0] = "<IDs>";
@@ -665,12 +665,11 @@ int lastprodindex(int r, int c) {
 }
 
 void syntaxerdriver(std::string filename) {
-    filltable();
     TDPPstack.push("$");
     std::vector<Token> inputstring;
     char ch = 0;
     std::ifstream input;
-    input.open(filename);// "C:/Users/Lonnie/Source/Repos/Compiler/Compiler/test.txt");
+    input.open(filename);
     linenumber = 0;
     //Adding tokens to a vector so that I don't need to worry about ch and input later.    
     while (input.get(ch)) {
@@ -708,7 +707,7 @@ void syntaxerdriver(std::string filename) {
         else {
             //gets the row of the non-terminal
             int r = nonterminalindex(t);
-            //gets the row of the terminal if the terminal character is a keyword, operator, or separator
+            //gets the column of the terminal if the terminal character is a keyword, operator, or separator
             int c = terminalindex(i.lexeme);
             if (c == -1)
                 //if the terminal is an integer, real, or identifier, get the index of the token type instead
@@ -741,6 +740,7 @@ void syntaxerdriver(std::string filename) {
 }
 
 int main(int argc, const char* argv[]) {
+    filltable();
     std::ifstream input;
     if (argc < 2) {
         std::cout << "Please specify a text file to run through the syntax analyzer" << std::endl;
@@ -753,7 +753,6 @@ int main(int argc, const char* argv[]) {
             break;
         }
         linenumber = 0;
-        char c;
         Token token;
         std::cout << std::endl << "========== Running " << argv[i] << " through the syntaxer ==========" << std::endl << std::endl;
         syntaxerdriver(argv[i]);
