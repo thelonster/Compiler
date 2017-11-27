@@ -14,7 +14,13 @@ struct Token {
     int lineno = 0;
 };
 
-int linenumber;
+struct Instruction {
+    int instaddr;
+    std::string oper8r;
+    int operand;
+};
+
+int linenumber, instraddress;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
@@ -25,6 +31,7 @@ std::vector<char> letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
 std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 std::stack<std::string> TDPPstack;
 std::string table[38][36][7];
+Instruction instrtable[500];
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
@@ -62,6 +69,10 @@ void filltable();
 int lastprodindex(int r, int c);
 /*Syntax analyzer driver for Table Driver Predictive Parser*/
 void syntaxerdriver(std::string filename);
+/*Procedure for ICG*/
+void gen_instr(std::string op, int opernd);
+/*Gets address of token from Symbol Table*/
+int get_address(std::string token);
 /*runs the syntaxer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H

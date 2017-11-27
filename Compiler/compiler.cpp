@@ -681,15 +681,29 @@ void syntaxerdriver(std::string filename) {
     temp.lexeme = "$";
     temp.token = "EOF";
     inputstring.push_back(temp);
-    int index = 0;
+    int index = 0, addr;
     TDPPstack.push("<RAT17F>");
     Token i = inputstring[index];
     std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
-    std::string t;
+    std::string t, save;
     while (TDPPstack.top() != "$") {
         t = TDPPstack.top();
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
+                if (i.token == "identifier") {
+                    SymbolTable new_sym;
+                    new_sym.address = instr_address++;
+                    new_sym.tok = i;
+                    save = i.lexeme;
+                }
+                else if (i.lexeme == ":=") {
+                    addr = get_address(save);
+                    gen_instr("POPM", addr);
+                }
+                else if (i.lexeme == "+")
+                    gen_instr("ADD", 0);
+                else if (i.lexeme == "*")
+                    gen_instr("MUL", 0);
                 TDPPstack.pop();
                 i = inputstring[++index];               
                 std::cout << "Token: " << std::setw(10) << std::left << i.token << " Lexeme: " << i.lexeme << std::endl;
@@ -737,6 +751,20 @@ void syntaxerdriver(std::string filename) {
     }
     std::cout << "Stack empty, Syntax correct!" << std::endl;
     input.close();
+}
+
+void gen_instr(std::string op, int oprnd) {
+    instrtable[instr_address].instaddr = instr_address;
+    instrtable[instr_address].oper8r = op;
+    instrtable[instr_address].operand = oprnd;
+    instr_address++;
+}
+
+int get_address(std::string token) {
+    for (int a = 0; a < symbol_table.size(); a++)
+        if (symbol_table[a].tok.lexeme == token)
+            return symbol_table[a].address;
+    return -1;
 }
 
 int main(int argc, const char* argv[]) {
