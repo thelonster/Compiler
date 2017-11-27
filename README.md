@@ -1,6 +1,6 @@
 # Compiler
 Compiler made from the ground up for CPSC 323 
 
-Currently the Lexical Analyzer is working.
+Currently both the Lexical and Syntax Analyzers are working.
 
-Starting work on Syntax Analyzer using a table driven RDP.
+Starting to add intermediate code generation to the project.
