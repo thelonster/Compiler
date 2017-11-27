@@ -62,6 +62,6 @@ void filltable();
 int lastprodindex(int r, int c);
 /*Syntax analyzer driver for Table Driver Predictive Parser*/
 void syntaxerdriver(std::string filename);
-/*runs the lexer*/
+/*runs the syntaxer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H
