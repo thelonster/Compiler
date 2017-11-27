@@ -681,29 +681,81 @@ void syntaxerdriver(std::string filename) {
     temp.lexeme = "$";
     temp.token = "EOF";
     inputstring.push_back(temp);
-    int index = 0, addr;
+    int index = 0;
     TDPPstack.push("<RAT17F>");
     Token i = inputstring[index];
     std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
+    bool assign_flag = 0, while_flag = 0;
     std::string t, save;
     while (TDPPstack.top() != "$") {
         t = TDPPstack.top();
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
-                if (i.token == "identifier" && inputstring[index+1].lexeme == ":=") {
-                    SymbolTable new_sym;
-                    new_sym.address = instr_address++;
-                    new_sym.tok = i;
-                    save = i.lexeme;
+                if (i.token == "identifier") {
+                    if (inputstring[index + 1].lexeme == ":=") {
+                        SymbolTable new_sym;
+                        new_sym.address = instr_address++;
+                        new_sym.tok = i;
+                        save = i.lexeme;
+                    }
+                    else if (inputstring[index + 1].lexeme == ";") {
+                        addr = get_address(i.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    
                 }
-                else if (i.lexeme == ":=") {
-                    addr = get_address(save);
-                    gen_instr("POPM", addr);
+                //use semi-colon and flags to find end of expressions
+                else if (i.lexeme == ";") {
+                    if (assign_flag) {
+                        addr = get_address(save);
+                        gen_instr("POPM", addr);
+                        assign_flag = 0;
+                    }
+                    else if (while_flag) {
+                        gen_instr("JUMP", addr);
+                        back_patch(instr_address);
+                        while_flag = 0;
+                    }
+
                 }
                 else if (i.lexeme == "+")
                     gen_instr("ADD", 0);
                 else if (i.lexeme == "*")
                     gen_instr("MUL", 0);
+                else if (i.lexeme == "while") {
+                    addr = instr_address;
+                    gen_instr("LABEL", 0);
+                }
+                else if (i.lexeme == "<") {
+                    gen_instr("LES", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
+                else if (i.lexeme == ">") {
+                    gen_instr("GRT", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
+                else if (i.lexeme == "=") {
+                    gen_instr("EQU", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
+                else if (i.lexeme == "/=") {
+                    gen_instr("NEQ", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
+                else if (i.lexeme == ">=") {
+                    gen_instr("GEQ", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
+                else if (i.lexeme == "<=") {
+                    gen_instr("LEQ", 0);
+                    jump_stack.push(instr_address);
+                    gen_instr("JUMPZ", 0);
+                }
                 TDPPstack.pop();
                 i = inputstring[++index];               
                 std::cout << "Token: " << std::setw(10) << std::left << i.token << " Lexeme: " << i.lexeme << std::endl;
@@ -736,6 +788,10 @@ void syntaxerdriver(std::string filename) {
                 TDPPstack.pop();
                 for (int h = lpi; h >= 0; h--)
                     TDPPstack.push(table[r][c][h]);
+                if (t == "<Assign>")
+                    assign_flag = true;
+                else if (t == "<While>")
+                    while_flag = true;
             }
             else {
                 //Prints out error message
@@ -765,6 +821,12 @@ int get_address(std::string token) {
         if (symbol_table[a].tok.lexeme == token)
             return symbol_table[a].address;
     return -1;
+}
+
+void back_patch(int jump_addr) {
+    addr = jump_stack.top();
+    jump_stack.pop();
+    instrtable[addr].operand = jump_addr;
 }
 
 int main(int argc, const char* argv[]) {

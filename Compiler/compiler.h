@@ -25,7 +25,7 @@ struct SymbolTable {
     Token tok;
 };
 
-int linenumber, instr_address;
+int linenumber, instr_address, addr;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
@@ -38,6 +38,7 @@ std::stack<std::string> TDPPstack;
 std::string table[38][36][7];
 Instruction instrtable[500];
 std::vector<SymbolTable> symbol_table;
+std::stack<int> jump_stack;
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);
@@ -79,6 +80,8 @@ void syntaxerdriver(std::string filename);
 void gen_instr(std::string op, int opernd);
 /*Gets address of token from Symbol Table*/
 int get_address(std::string token);
+/*Adds address to jump_stack so it can be back patched*/
+void back_patch(int jump_addr);
 /*runs the syntaxer*/
 int main(int argc, const char * argv[]);
 #endif // !COMPILER_H
