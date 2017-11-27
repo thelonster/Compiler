@@ -20,7 +20,12 @@ struct Instruction {
     int operand;
 };
 
-int linenumber, instraddress;
+struct SymbolTable {
+    int address;
+    Token tok;
+};
+
+int linenumber, instr_address;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
@@ -32,6 +37,7 @@ std::vector<char> numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 std::stack<std::string> TDPPstack;
 std::string table[38][36][7];
 Instruction instrtable[500];
+std::vector<SymbolTable> symbol_table;
 
 /*Lexical Analyzer function that currently just prints tokens/lexemes*/
 Token lexer(std::ifstream& input, char c);

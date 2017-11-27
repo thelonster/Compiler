@@ -690,7 +690,7 @@ void syntaxerdriver(std::string filename) {
         t = TDPPstack.top();
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
-                if (i.token == "identifier") {
+                if (i.token == "identifier" && inputstring[index+1].lexeme == ":=") {
                     SymbolTable new_sym;
                     new_sym.address = instr_address++;
                     new_sym.tok = i;
