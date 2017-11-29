@@ -685,7 +685,7 @@ void syntaxerdriver(std::string filename) {
     TDPPstack.push("<RAT17F>");
     Token i = inputstring[index];
     std::cout << "Token: " << i.token << " Lexeme: " << i.lexeme << std::endl;
-    bool assign_flag = 0, while_flag = 0;
+    bool assign_flag = 0, while_flag = 0, if_flag = 0, else_flag = 0;
     std::string t, save;
     while (TDPPstack.top() != "$") {
         t = TDPPstack.top();
@@ -756,6 +756,18 @@ void syntaxerdriver(std::string filename) {
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
                 }
+                else if (i.lexeme == "if") {
+                    addr = instr_address;
+                }
+                else if (i.lexeme == "fi") {
+                    if (if_flag && !else_flag) {
+                        back_patch(instr_address);
+                        if_flag = 0;
+                    }
+                    else {
+
+                    }
+                }
                 TDPPstack.pop();
                 i = inputstring[++index];               
                 std::cout << "Token: " << std::setw(10) << std::left << i.token << " Lexeme: " << i.lexeme << std::endl;
@@ -792,6 +804,10 @@ void syntaxerdriver(std::string filename) {
                     assign_flag = true;
                 else if (t == "<While>")
                     while_flag = true;
+                else if (t == "<If>")
+                    if_flag = true;
+                else if (table[r][c][0] == "else")
+                    else_flag = true;
             }
             else {
                 //Prints out error message
