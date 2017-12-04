@@ -25,7 +25,7 @@ struct SymbolTable {
     Token tok;
 };
 
-int linenumber, instr_address, addr;
+int linenumber, instr_address, addr = 0, oprnd_addr = 3000;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
@@ -84,6 +84,8 @@ int get_address(std::string token);
 void back_patch(int jump_addr);
 /*Prints out the instruction table*/
 void print_table();
+/*Checks if the symbol is in the table, returns it's index*/
+int symbol_table_lookup(Token );
 /*runs the syntaxer*/
 int main(int argc, const char * argv[]);
 

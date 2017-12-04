@@ -365,6 +365,9 @@ void filltable() {
     table[0][0][1] = "%%";
     table[0][0][2] = "<Opt Declaration List>";
     table[0][0][3] = "<Statement List>";
+    table[0][27][0] = "%%";
+    table[0][27][1] = "<Opt Declaration List>";
+    table[0][27][2] = "<Statement List>";
     table[0][35][0] = "epsilon";
     table[1][0][0] = "<Function Definitions>";
     table[1][27][0] = "epsilon";
@@ -691,18 +694,32 @@ void syntaxerdriver(std::string filename) {
         t = TDPPstack.top();
         if (!isnonterminal(t)) {
             if (t == i.lexeme || t == i.token) {
-                if (i.token == "identifier") {
+                if (i.token == "id" && assign_flag) {
                     if (inputstring[index + 1].lexeme == ":=") {
-                        SymbolTable new_sym;
-                        new_sym.address = instr_address++;
-                        new_sym.tok = i;
-                        save = i.lexeme;
+                        int sim_index = symbol_table_lookup(i);
+                        if (sim_index == -1) {
+                            std::cout << "Error: Symbol not in Symbol Table" << std::endl;
+                        }
+                        else {
+                            SymbolTable sym = symbol_table[sim_index];
+                            save = sym.tok.lexeme;
+                            addr = get_address(sym.tok.lexeme);
+                            gen_instr("PUSHM", addr);
+
+                        }
+                            
                     }
-                    else if (inputstring[index + 1].lexeme == ";") {
+                    else {// if (inputstring[index + 1].lexeme == ";") {
                         addr = get_address(i.lexeme);
                         gen_instr("PUSHM", addr);
                     }
                     
+                }
+                else if (i.token == "id") {
+                    SymbolTable new_sym;
+                    new_sym.address = oprnd_addr++;
+                    new_sym.tok = i;
+                    symbol_table.push_back(new_sym);
                 }
                 //use semi-colon and flags to find end of expressions
                 else if (i.lexeme == ";") {
@@ -720,8 +737,12 @@ void syntaxerdriver(std::string filename) {
                 }
                 else if (i.lexeme == "+")
                     gen_instr("ADD", 0);
+                else if (i.lexeme == "-")
+                    gen_instr("SUB", 0);
                 else if (i.lexeme == "*")
                     gen_instr("MUL", 0);
+                else if (i.lexeme == "/")
+                    gen_instr("DIV", 0);
                 else if (i.lexeme == "while") {
                     addr = instr_address;
                     gen_instr("LABEL", 0);
@@ -821,6 +842,7 @@ void syntaxerdriver(std::string filename) {
             }
         }
     }
+    gen_instr("nil", 0);
     std::cout << "Stack empty, Syntax correct!" << std::endl;
     input.close();
 }
@@ -833,7 +855,8 @@ void gen_instr(std::string op, int oprnd) {
 }
 
 int get_address(std::string token) {
-    for (int a = 0; a < symbol_table.size(); a++)
+    int table_size = static_cast<int>(symbol_table.size());
+    for (int a = 0; a < table_size; a++)
         if (symbol_table[a].tok.lexeme == token)
             return symbol_table[a].address;
     return -1;
@@ -846,10 +869,20 @@ void back_patch(int jump_addr) {
 }
 
 void print_table() {
-    std::cout << "Address\tOperator\tOpearand" << std::endl;
+    std::cout << "Address\tOperator\tOperand" << std::endl;
     for (int a = 0; a < instr_address; a++) {
-        std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t" << instrtable[a].operand << std::endl;
+        std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t\t" 
+            << (instrtable[a].operand != 0 ? std::to_string(instrtable[a].operand) : "nil") << std::endl;
     }
+}
+
+int symbol_table_lookup(Token t) {
+    int index = 0;
+    for (auto it = symbol_table.begin(); it != symbol_table.end(); it++, index++) {
+        if (it->tok.lexeme == t.lexeme && it->tok.token == t.token)
+            return index;
+    }
+    return -1;
 }
 
 int main(int argc, const char* argv[]) {
@@ -869,6 +902,7 @@ int main(int argc, const char* argv[]) {
         Token token;
         std::cout << std::endl << "========== Running " << argv[i] << " through the syntaxer ==========" << std::endl << std::endl;
         syntaxerdriver(argv[i]);
+        print_table();
     }
     return 0;
 }
