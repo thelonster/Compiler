@@ -82,6 +82,9 @@ void gen_instr(std::string op, int opernd);
 int get_address(std::string token);
 /*Adds address to jump_stack so it can be back patched*/
 void back_patch(int jump_addr);
+/*Prints out the instruction table*/
+void print_table();
 /*runs the syntaxer*/
 int main(int argc, const char * argv[]);
+
 #endif // !COMPILER_H

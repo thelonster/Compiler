@@ -829,6 +829,13 @@ void back_patch(int jump_addr) {
     instrtable[addr].operand = jump_addr;
 }
 
+void print_table() {
+    std::cout << "Address\tOperator\tOpearand" << std::endl;
+    for (int a = 0; a < instr_address; a++) {
+        std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t" << instrtable[a].operand << std::endl;
+    }
+}
+
 int main(int argc, const char* argv[]) {
     filltable();
     std::ifstream input;
