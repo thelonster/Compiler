@@ -721,10 +721,17 @@ void syntaxerdriver(std::string filename) {
                         if (next == "+" || next == "-" || next == "*" || next == "/") {
                             std::cout << "SOMETHING HAPPENED ------------------------" << std::endl;
                             int sym_index = symbol_table_lookup(inputstring[index + 2]);
-                            SymbolTable sym = symbol_table[sym_index];
-                            addr = get_address(sym.tok.lexeme);
-                            gen_instr("PUSHM", addr);
-                            skip = true;
+                            if (sym_index != -1) {
+                                SymbolTable sym = symbol_table[sym_index];
+                                addr = get_address(sym.tok.lexeme);
+                                gen_instr("PUSHM", addr);
+                                skip = true;
+                            }
+                            else {
+                                gen_instr("PUSHI", std::stoi(inputstring[index + 2].lexeme));
+                                skip = true;
+                            }
+
                         }
                         
                     }
@@ -769,7 +776,22 @@ void syntaxerdriver(std::string filename) {
                 }
                 else if (i.lexeme == "read") {
                     gen_instr("STDIN", 0);
+                    int sym_index = symbol_table_lookup(inputstring[index + 2]);
+                    if (sym_index == -1) {
+                        std::cout << "Error: Symbol not in Symbol Table" << std::endl;
+                    }
+                    else {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("POPM", addr);
+                    }
 
+                }
+                else if (i.token == "integer") {
+                    if (!skip)
+                        gen_instr("PUSHI", std::stoi(i.lexeme));
+                    else
+                        skip = false;
                 }
                 else if (i.token == "keyword") {
                     if (i.lexeme == "integer" || i.lexeme == "real" || i.lexeme == "float" || i.lexeme == "boolean") {
@@ -919,7 +941,7 @@ void syntaxerdriver(std::string filename) {
             }
         }
     }
-    gen_instr("nil", 0);
+    gen_instr("", 0);
     std::cout << "Stack empty, Syntax correct!" << std::endl;
     input.close();
 }
@@ -949,7 +971,11 @@ void print_instr_table() {
     std::cout << "Address\tOperator\tOperand" << std::endl;
     //Starts at 1 instead of 0
     for (int a = 1; a < instr_address; a++) {
-        std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t\t" 
+        if (instrtable[a].oper8r == "PUSHI")
+            std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t\t"
+            << instrtable[a].operand << std::endl;
+        else
+            std::cout << instrtable[a].instaddr << "\t" << instrtable[a].oper8r << "\t\t" 
             << (instrtable[a].operand != 0 ? std::to_string(instrtable[a].operand) : "") << std::endl;
     }
 }
