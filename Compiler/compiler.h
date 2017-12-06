@@ -26,7 +26,7 @@ struct SymbolTable {
     std::string type;
 };
 
-int linenumber, instr_address, addr = 0, oprnd_addr = 3000;
+int linenumber, instr_address = 1, addr = 0, oprnd_addr = 3000;
 std::vector<std::string> keywords = { "while", "if", "int", "fi", "else", "return", "read", "write", "integer", "real", "boolean", "true", "false" };
 std::vector<char> separators = { '(', ')', '{', '}', '%', '@', '[', ']', ';', ',', '.' };
 std::vector<std::string> multiseparators = { "%%" };
