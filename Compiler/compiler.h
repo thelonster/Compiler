@@ -23,6 +23,7 @@ struct Instruction {
 struct SymbolTable {
     int address;
     Token tok;
+    std::string type;
 };
 
 int linenumber, instr_address, addr = 0, oprnd_addr = 3000;
@@ -83,9 +84,11 @@ int get_address(std::string token);
 /*Adds address to jump_stack so it can be back patched*/
 void back_patch(int jump_addr);
 /*Prints out the instruction table*/
-void print_table();
+void print_instr_table();
 /*Checks if the symbol is in the table, returns it's index*/
 int symbol_table_lookup(Token );
+/*Prints out the symbol table*/
+void print_sym_table();
 /*runs the syntaxer*/
 int main(int argc, const char * argv[]);
 
