@@ -8,4 +8,4 @@
         sum := sum + i;
         i := i + 1;    
     }
-    
+    write(sum + max);

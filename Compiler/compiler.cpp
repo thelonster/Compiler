@@ -704,22 +704,17 @@ void syntaxerdriver(std::string filename) {
                             SymbolTable sym = symbol_table[sym_index];
                             save = sym.tok.lexeme;
                             addr = get_address(sym.tok.lexeme);
-                            //gen_instr("PUSHM", addr);
-
-                        }
-                            
+                        }                                                   
                     }
-                    else {// if (inputstring[index + 1].lexeme == ";") {
+                    else {
                         addr = get_address(i.lexeme);
                         if (!skip) {
                             gen_instr("PUSHM", addr);
                         }
                         else
-                            skip = false;
-                            
+                            skip = false;                            
                         std::string next = inputstring[index + 1].lexeme;
                         if (next == "+" || next == "-" || next == "*" || next == "/") {
-                            std::cout << "SOMETHING HAPPENED ------------------------" << std::endl;
                             int sym_index = symbol_table_lookup(inputstring[index + 2]);
                             if (sym_index != -1) {
                                 SymbolTable sym = symbol_table[sym_index];
@@ -731,11 +726,8 @@ void syntaxerdriver(std::string filename) {
                                 gen_instr("PUSHI", std::stoi(inputstring[index + 2].lexeme));
                                 skip = true;
                             }
-
-                        }
-                        
-                    }
-                    
+                        }                        
+                    }                    
                 }
                 else if (i.token == "id" && (while_flag || if_flag)) {
                     int sym_index = symbol_table_lookup(i);
@@ -749,6 +741,34 @@ void syntaxerdriver(std::string filename) {
                         if (!cond_flag) {
                             gen_instr("PUSHM", addr);
                             cond_flag = false;
+                        }
+                    }
+                }
+                else if (i.token == "id" && write_flag) {
+                    int sym_index = symbol_table_lookup(i);
+                    if (sym_index == -1) {
+                        std::cout << "Error: Symbol not in Symbol Table" << std::endl;
+                    }
+                    else {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        if (!skip)
+                            gen_instr("PUSHM", addr);
+                        else
+                            skip = false;
+                        std::string next = inputstring[index + 1].lexeme;
+                        if (next == "+" || next == "-" || next == "*" || next == "/") {
+                            int sym_index = symbol_table_lookup(inputstring[index + 2]);
+                            if (sym_index != -1) {
+                                SymbolTable sym = symbol_table[sym_index];
+                                addr = get_address(sym.tok.lexeme);
+                                gen_instr("PUSHM", addr);
+                                skip = true;
+                            }
+                            else {
+                                gen_instr("PUSHI", std::stoi(inputstring[index + 2].lexeme));
+                                skip = true;
+                            }
                         }
                     }
                 }
@@ -805,6 +825,10 @@ void syntaxerdriver(std::string filename) {
                         gen_instr("POPM", addr);
                         assign_flag = 0;
                     }
+                    else if (write_flag) {
+                        gen_instr("STDOUT", 0);
+                        write_flag = 0;
+                    }
                 }
                 else if (i.lexeme == "}") {
                     if (while_flag) {
@@ -833,9 +857,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == "<") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("LES", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -843,9 +873,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == ">") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("GRT", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -853,9 +889,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == "=") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("EQU", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -863,9 +905,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == "/=") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("NEQ", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -873,9 +921,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == ">=") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("GEQ", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -883,9 +937,15 @@ void syntaxerdriver(std::string filename) {
                 else if (i.lexeme == "<=") {
                     cond_flag = true;
                     int sym_index = symbol_table_lookup(inputstring[index + 1]);
-                    SymbolTable sym = symbol_table[sym_index];
-                    addr = get_address(sym.tok.lexeme);
-                    gen_instr("PUSHM", addr);
+                    if (sym_index != -1) {
+                        SymbolTable sym = symbol_table[sym_index];
+                        addr = get_address(sym.tok.lexeme);
+                        gen_instr("PUSHM", addr);
+                    }
+                    else {
+                        gen_instr("PUSHI", std::stoi(inputstring[index + 1].lexeme));
+                        skip = true;
+                    }
                     gen_instr("LEQ", 0);
                     jump_stack.push(instr_address);
                     gen_instr("JUMPZ", 0);
@@ -928,6 +988,8 @@ void syntaxerdriver(std::string filename) {
                     while_flag = true;
                 else if (t == "<If>")
                     if_flag = true;
+                else if (t == "<Write>")
+                    write_flag = true;
             }
             else {
                 //Prints out error message
@@ -941,7 +1003,6 @@ void syntaxerdriver(std::string filename) {
             }
         }
     }
-    gen_instr("", 0);
     std::cout << "Stack empty, Syntax correct!" << std::endl;
     input.close();
 }
@@ -1013,7 +1074,9 @@ int main(int argc, const char* argv[]) {
         Token token;
         std::cout << std::endl << "========== Running " << argv[i] << " through the syntaxer ==========" << std::endl << std::endl;
         syntaxerdriver(argv[i]);
+        std::cout << std::endl << "========== Printing Instruction table ==========" << std::endl << std::endl;
         print_instr_table();
+        std::cout << std::endl << "========== Printing Symbol table ==========" << std::endl << std::endl;
         print_sym_table();
     }
     return 0;
